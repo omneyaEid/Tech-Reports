@@ -1,0 +1,104 @@
+<style>
+    .frappe-control {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 15px;
+    }
+    .frappe-control label {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    .frappe-control input, .frappe-control select {
+        border: none;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5px;
+        width: 200px;
+    }
+    .page-form {
+        direction: rtl;
+        text-align: right;
+        margin-right: 150px;
+        justify-content: space-around;
+    }
+    .select-icon {
+        display: none; /* Hide the default icon if needed */
+    }
+    .dt-cell__content {
+        border-bottom: 1px darkred solid;
+        border-left: 1px darkred solid;
+        text-align: center;
+    }
+</style>
+
+<!-- Report Title -->
+<h1 class="text-center" style="color: darkred;">{%= __("تقرير عن الموقف المالي للعملاء حتي") %}</h1>
+<hr style="border: 1px solid darkred; margin-top: 10px;">
+
+<!-- Customer Details -->
+<h4 class="text-center">
+    {% if (filters.customer) { %}
+        {%= __("اسم العميل: ") %} {%= filters.customer %}
+    {% } %}
+</h4>
+
+<!-- Period Details -->
+<h5 class="text-center">
+    {%= __("من") %} {%= frappe.datetime.str_to_user(filters.from_date) %}
+    {%= __("الي") %} {%= frappe.datetime.str_to_user(filters.to_date) %}
+</h5>
+<hr>
+
+<!-- Table for Financial Data -->
+<!-- Table for Financial Data -->
+<table class="table table-bordered" style="border-color: darkred;">
+    <thead style="border-color: darkred;">
+        <tr style="border-color: darkred;">
+            <th style="width: 15%; border-color: darkred;">{%= __("الرصيد المفتوح") %}</th>
+            <th style="width: 15%; border-color: darkred;">{%= __("اجمالي المتحصلات") %}</th>
+            <th style="width: 15%; border-color: darkred;">{%= __("اجمالي المرتجع") %}</th>
+            <th style="width: 15%; border-color: darkred;">{%= __("اجمالي المنصرف") %}</th>
+            <th style="width: 15%; border-color: darkred;">{%= __("رصيد بداية الفترة") %}</th>
+            <th style="width: 20%; border-color: darkred;">{%= __("اسم العميل") %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% var total_opening_balance = 0; %}
+        {% var total_invoiced_amount = 0; %}
+        {% var total_return_amount = 0; %}
+        {% var total_paid_amount = 0; %}
+        {% var total_closing_balance = 0; %}
+
+        {% for (var i=0, l=data.length -1; i<l; i++) { %}
+            <tr>
+                <td style="text-align: right; border-color: darkred;">{%= format_currency(data[i].opening_balance, filters.presentation_currency) %}</td>
+                <td style="text-align: right; border-color: darkred;">{%= format_currency(data[i].paid_amount, filters.presentation_currency) %}</td>
+                <td style="text-align: right; border-color: darkred;">{%= format_currency(data[i].return_amount, filters.presentation_currency) %}</td>
+                <td style="text-align: right; border-color: darkred;">{%= format_currency(data[i].invoiced_amount, filters.presentation_currency) %}</td>
+                <td style="text-align: right; border-color: darkred;">{%= format_currency(data[i].closing_balance, filters.presentation_currency) %}</td>
+                <td style="text-align: right; border-color: darkred;">{%= data[i].customer_name %}</td>
+                {% 
+                    total_opening_balance += data[i].opening_balance;
+                    total_invoiced_amount += data[i].invoiced_amount;
+                    total_return_amount += data[i].return_amount;
+                    total_paid_amount += data[i].paid_amount;
+                    total_closing_balance += data[i].closing_balance;
+                %}
+            </tr>
+        {% } %}
+        <!-- Total Row -->
+        <tr style="font-weight: bold; border-color: darkred;">
+            <td style="font-weight: bold; text-align: right; color: darkred; border-color: darkred;">{%= format_currency(total_opening_balance, filters.presentation_currency) %}</td>
+            <td style="font-weight: bold; text-align: right; color: darkred; border-color: darkred;">{%= format_currency(total_paid_amount, filters.presentation_currency) %}</td>
+            <td style="font-weight: bold; text-align: right; color: darkred; border-color: darkred;">{%= format_currency(total_return_amount, filters.presentation_currency) %}</td>
+            <td style="font-weight: bold; text-align: right; color: darkred; border-color: darkred;">{%= format_currency(total_invoiced_amount, filters.presentation_currency) %}</td>
+            <td style="font-weight: bold; text-align: right; color: darkred; border-color: darkred;">{%= format_currency(total_closing_balance, filters.presentation_currency) %}</td>
+            <td style="text-align: right; font-weight: bold; color: darkred; border-color: darkred;">{%= __("الاجمالي") %}</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Footer -->
+<p class="text-right text-muted">
+    {%= __("تمت الطباعة في: ") %} {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
+</p>

@@ -1,0 +1,81 @@
+<style>
+    .frappe-control {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 15px;
+    }
+    .frappe-control label {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+    .frappe-control input, .frappe-control select {
+        border: none;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5px;
+        width: 200px;
+    }
+    .page-form {
+        direction: rtl;
+        text-align: right;
+        margin-right: 150px;
+        justify-content: space-around;
+    }
+    .select-icon {
+        display: none; /* Hide the default icon if needed */
+    }
+    .dt-cell__content {
+        border-bottom: 1px darkred solid;
+        border-left: 1px darkred solid;
+        text-align: center;
+    }
+</style>
+
+<!-- Report Title -->
+<h1 class="text-center" style="color: darkred;">{%= __("تقرير عن مبيعات الاصناف لصنف خلال فتره") %}</h1>
+<hr style="border: 1px solid darkred; margin-top: 10px;">
+
+
+<!-- Period Details -->
+<h5 class="text-center">
+    {%= __("من") %} {%= frappe.datetime.str_to_user(filters.from_date) %}
+    {%= __("الي") %} {%= frappe.datetime.str_to_user(filters.to_date) %}
+</h5>
+<hr>
+
+<!-- Table for Sales Data -->
+<table class="table table-bordered" style="border-color: darkred;">
+    <thead style="border-color: darkred;">
+        <tr style="border-color: darkred;">
+            <th style="width: 20%; border-color: darkred;">{%= __("الدرجة") %}</th>
+            <th style="width: 20%; border-color: darkred;">{%= __("الكمية") %}</th>
+            <th style="width: 15%; border-color: darkred;">{%= __("عدد الصناديق") %}</th>
+            <th style="width: 20%; border-color: darkred;">{%= __("الصنف") %}</th>
+            <th style="width: 12%; border-color: darkred;">{%= __("اسم العميل") %}</th> 
+        </tr>
+    </thead>
+    <tbody>
+        {% var total_qty = 0; %}
+        {% for (var i=0, l=data.length -1; i<l; i++) { %}
+            <tr>
+                <td style="border-color: darkred;">{%= data[i].grade %}</td>
+                <td style="text-align: right; border-color: darkred;">{%= data[i].qty %}</td>
+                <td style="border-color: darkred;"></td>
+                <td style="border-color: darkred;">{%= data[i].item_code %}</td>
+                <td style="border-color: darkred;">{%= data[i].customer_name %}</td>
+                {% total_qty += data[i].qty; %}
+            </tr>
+        {% } %}
+        <!-- Total Row -->
+        <tr style="font-weight: bold; border-color: darkred;">
+            <td style="border-color: darkred;"></td>
+            <td style="font-weight: bold; text-align: right; color: darkred; border-color: darkred;">{%= total_qty %}</td>
+            <td colspan="3" style="font-weight: bold; text-align: right; color: darkred; border-color: darkred;">{%= __("الاجمالي") %}</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Footer -->
+<p class="text-right text-muted">
+    {%= __("تمت الطباعة في: ") %} {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
+</p>
